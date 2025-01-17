@@ -2,8 +2,8 @@
 
 簡易な手順
 
-・以下のレポジトリをimportする
-URL：
+・以下のレポジトリをimportする  
+URL：https://github.com/k-magrudertest1/chat-app-demo.git
 
 ・issueの作成する
 　・誰がチャットにコメントしたのか分かりづらいのでユーザ名が表示されるように変更する
