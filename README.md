@@ -5,11 +5,11 @@
 ・以下のレポジトリをimportする(repository nameは `devflow-training` )  
 URL：https://github.com/k-magrudertest1/chat-app-demo.git
 
-・issueの作成する
-　・誰がチャットにコメントしたのか分かりづらいのでユーザ名が表示されるように変更する
-　　・テストも変更する
+・issueの作成する  
+　・誰がチャットにコメントしたのか分かりづらいのでユーザ名が表示されるように変更する  
+　　・テストも変更する  
 
-・GitHub Packageにpushされたdockerコンテナイメージを以下の環境でpullする
+・GitHub Packageにpushされたdockerコンテナイメージを以下の環境でpullする  
 https://shell.cloud.google.com/
 
 ex. docker pull ghcr.io/k-magrudertest1/dev-flow-handson:run-1
@@ -255,7 +255,7 @@ module.exports = new MessageHandler();
 
 ---
 
-・GitHub Packageにpushされた新たなdockerコンテナイメージを以下の環境でpullする
+・GitHub Packageにpushされた新たなdockerコンテナイメージを以下の環境でpullする  
 https://shell.cloud.google.com/
 
 ex. docker pull ghcr.io/k-magrudertest1/dev-flow-handson:run-4
