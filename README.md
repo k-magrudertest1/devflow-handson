@@ -5,8 +5,8 @@
 ・以下のレポジトリをimportする(repository nameは `devflow-training` )  
 URL：https://github.com/k-magrudertest1/chat-app-demo.git
 
-・issueの作成する  
-　・誰がチャットにコメントしたのか分かりづらいのでユーザ名が表示されるように変更する  
+・issueを作成する  
+ ・誰がチャットにコメントしたのか分かりづらいのでユーザ名が表示されるように変更する  
 　　・テストも変更する  
 
 ・GitHub Packageにpushされたdockerコンテナイメージを以下の環境でpullする  
@@ -367,6 +367,8 @@ jobs:
 ・commitする
 
 ・github actionsのステータスを確認すると、セキュリティテストで失敗していることがわかる(CVE-2024-21538)
+
+・上記CVE対応のissueを作成する
 
 ---
 
