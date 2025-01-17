@@ -2,7 +2,7 @@
 
 簡易な手順
 
-・以下のレポジトリをimportする  
+・以下のレポジトリをimportする(repository nameは `devflow-training` )  
 URL：https://github.com/k-magrudertest1/chat-app-demo.git
 
 ・issueの作成する
