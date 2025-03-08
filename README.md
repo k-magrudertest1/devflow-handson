@@ -5,10 +5,11 @@
 ・以下のレポジトリをimportする(repository nameは `devflow-training` )  
 URL：https://github.com/k-magrudertest1/chat-app-demo.git
 
+[//]: # (COMMENT: ここの手順はスライドの方で書くので、手順に含めなくても大丈夫です)
 ・issueを作成する  
  ・誰がチャットにコメントしたのか分かりづらいのでユーザ名が表示されるように変更する  
 　　・テストも変更する  
-
+**cloud shellじゃなくてgithub codespaceでもいけそうな気がするのでいらないかもしれないですね**
 ・GitHub Packageにpushされたdockerコンテナイメージを以下の環境でpullする  
 https://shell.cloud.google.com/
 
@@ -16,6 +17,7 @@ ex. docker pull ghcr.io/k-magrudertest1/dev-flow-handson:run-1
 
 ・以下のコマンドでアプリを実行する
 
+[//]: # (COMMENT: cloud shellじゃなくてgithub codespaceでもいけそうな気がするのでいらないかもしれないですね)
 ex. docker run -d -p 3001:3000 ghcr.io/k-magrudertest1/dev-flow-handson:run-1
 
 ・「ウェブでプレビュー」で3001ポートでアクセスする
@@ -25,13 +27,15 @@ ex. docker run -d -p 3001:3000 ghcr.io/k-magrudertest1/dev-flow-handson:run-1
 ex. docker rm -f $(docker ps -qa)
 
 ---
-
+[//]: # (TODO: 細かいですが、 feature/show-usernameにしてほしいです)
 ・「useradd」というブランチを作成
 
 ・Codespacesでファイルを編集する
 
 ・まず、「tests/messageHandler.test.js」ファイルを編集する(以下のファイルを丸ごとコピペ⇒差分はCodespaces上か、GitHubで確認)
 
+[//]: # (COMMENT: できるかわからないですが、テストコードを一つずつ変更して直すみたいな手順にできると嬉しいです。のちほど相談させて下さい！)
+[//]: # (TODO: テストメソッド名は日本語にします。僕の方でやります)
 ```
 import { describe, it, expect } from 'vitest';
 import messageHandler from '../src/messageHandler';
@@ -86,7 +90,7 @@ describe('MessageHandler', () => {
 ```
 
 ・次に、「tests/server.test.js」ファイルを編集する(以下のファイルを丸ごとコピペ⇒差分はCodespaces上か、GitHubで確認)
-
+[//]: # (TODO: テストメソッド名は日本語にします。僕の方でやります)
 ```
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { createServer } from 'http';
@@ -152,9 +156,10 @@ describe('Chat Server', () => {
 });
 ```
 
-・一度commitする
+・一度commitしてpushする
 
-・pull request作成
+[//]: # (TODO: ここはactionsの変更も必要ですが、PRを作成せずにpushしたらCIが走って落ちることを確認する感じにしたいです)
+・パイプライン上でテストが落ちていることを確認する
 
 ・テストは、usernameがあることを前提に書かれているが、まだアプリに反映していないので、パイプラインはテストで失敗する。
 
@@ -251,10 +256,12 @@ module.exports = new MessageHandler();
 
 ・commitする
 
+[//]: # (TODO: 複数メンバー前提にしたいので、ここで開発者②がコメントを入れて承認するという流れを追加したいです)
 ・テストがクリアしたことを確認し、mergeする(ブランチも消す)
 
 ---
 
+[//]: # (COMMENT: ここもcodespace内で完結すると思います)
 ・GitHub Packageにpushされた新たなdockerコンテナイメージを以下の環境でpullする  
 https://shell.cloud.google.com/
 
@@ -271,6 +278,13 @@ ex. docker run -d -p 3001:3000 ghcr.io/k-magrudertest1/dev-flow-handson:run-4
 ex. docker rm -f $(docker ps -qa)
 
 ---
+
+[//]: # (ここはスライドの方で書くので、手順には書かなくても良いかなと思います)
+・ issueを作成する  
+CIパイプラインにセキュリティスキャンを組み込む
+[//]: # (完了条件としてCIがすべて通っているを追加したい)
+
+・ 「feature/introduce-trivy-pipeline」というブランチの作成
 
 ・「.github/workflows/ci-cd.yml」を編集する(セキュリティスキャンを追加)
 
@@ -366,13 +380,15 @@ jobs:
 
 ・commitする
 
+[//]: # (CVEがなんなのかとかはスライドの方で説明します)
 ・github actionsのステータスを確認すると、セキュリティテストで失敗していることがわかる(CVE-2024-21538)
 
-・上記CVE対応のissueを作成する
+[//]: # (最初のissueがCIが通るところまでをスコープにするので削除)
+~~・上記CVE対応のissueを作成する~~
 
 ---
-
-・「patch」というブランチを作成
+[//]: # (最初のissueがCIが通るところまでをスコープにするので削除)
+~~・「patch」というブランチを作成~~
 
 ・まず、「.github/workflows/ci-cd.yml」ファイルを編集する(差分はCodespaces上か、GitHubで確認)
 
@@ -384,8 +400,11 @@ FROM node:18-slim を FROM node:23-slim に変更する
 
 ・一度commitする
 
+・CIが通ることの確認
+
 ・pull request作成
 
-・テストがクリアしたことを確認する。
+~~・テストがクリアしたことを確認する。~~
 
+・開発者②にapproveしてもらう
 
