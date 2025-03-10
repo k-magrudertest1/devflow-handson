@@ -374,7 +374,7 @@ docker rm -f $(docker ps -qa)
 
 1. レビューアは、作成された pull request を開きます。
 
-1. 「add your review」をクリックします。
+1. 「Add your review」をクリックします。
 
 1. 変更内容を確認したら、「Review changes」をクリックし、「問題なさそうですb」とコメントを記し、「Approve」を選択して、「Submit review」をクリックします。
 
@@ -449,7 +449,6 @@ jobs:
         run: npm test
 
   docker-build-push:
-    if: github.event.pull_request.merged == true
     needs: build-and-test
     runs-on: ubuntu-latest
     permissions:
@@ -506,7 +505,70 @@ jobs:
 
 1. ここで、変更作業を commit して、push します。コミットメッセージを入力して、「コミット」をクリックします。
 
+1. 「変更の同期」をクリックします。
+
 ---
+
+1. codespace から抜けて、「devflow-training」という Repository に戻ります。
+
+1. 「feature/introduce-trivy-pipeline」ブランチ上で作業します。
+
+1. 「Actions」タブをクリックします。
+
+1. 先ほど コミット したことで実行されたパイプラインのステータスを確認します。(追加したセキュリティスキャンが失敗していることを確認します。)
+
+---
+
+1. codespaceに戻ります。
+
+1. まず、「.github/workflows/ci-cd.yml」ファイルを編集します。( `node-version: '18'` を `node-version: '23'` に変更してください。)
+
+1. 次に、「Dockerfile」ファイルを編集します。(FROM node:18-slim を FROM node:23-slim に変更してください。)
+
+1. 変更作業を commit して、push します。コミットメッセージを入力して、「コミット」をクリックします。
+
+1. 「変更の同期」をクリックします。
+
+---
+
+1. codespace から抜けて、「devflow-training」という Repository に戻ります。
+
+1. 「feature/introduce-trivy-pipeline」ブランチ上で作業します。
+
+1. 「Actions」タブをクリックします。
+
+1. 先ほど コミット したことで実行されたパイプラインのステータスを確認します。(パイプラインが失敗していないことを確認します。)
+
+1. 「feature/introduce-trivy-pipeline」ブランチ上で、pull request を作成します。
+
+1. 作成した pull request に Reviewers を追加します。(追加されたユーザーがレビューを行います)
+
+---
+
+1. レビューアは、作成された pull request を開きます。
+
+1. 「Add your review」をクリックします。
+
+1. 変更内容を確認したら、「Review changes」をクリックし、「問題なさそうですb」とコメントを記し、「Approve」を選択して、「Submit review」をクリックします。
+
+---
+
+1. 開発者は、レビューアから Approved されたことを確認します。
+
+1. 「Merge pull request」をクリックします。
+
+1. 「Confirm merge」をクリックします。
+
+1. 「Delete branch」をクリックします。
+
+1. 「Delete codespace」をクリックします。
+
+1. 「Actions」タブをクリックします。
+
+1. 先ほど pull request をマージしたことで実行されたパイプラインのステータスを確認します。(パイプラインが失敗していないことを確認します。)
+
+
+
 
 
 [//]: # (TODO: ここはactionsの変更も必要ですが、PRを作成せずにpushしたらCIが走って落ちることを確認する感じにしたいです)
@@ -592,127 +654,6 @@ jobs:
 CIパイプラインにセキュリティスキャンを組み込む
 [//]: # (完了条件としてCIがすべて通っているを追加したい)
 
-・ 「feature/introduce-trivy-pipeline」というブランチの作成
-
-・「.github/workflows/ci-cd.yml」を編集する(セキュリティスキャンを追加)
-
-・以下のファイルを丸ごとコピペ⇒差分はCodespaces上か、GitHubで確認
-
-```
-name: CI/CD Pipeline
-
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
-
-env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
-  IMAGE_TAG: run-${{ github.run_number }}
-
-jobs:
-  build-and-test:
-    runs-on: ubuntu-latest
-    
-    steps:
-      - uses: actions/checkout@v3
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-          cache: 'npm'
-          
-      - name: Install dependencies
-        run: npm ci
-        
-      - name: Run tests
-        run: npm test
-
-  docker-build-push:
-    needs: build-and-test
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-    outputs:
-      image-digest: ${{ steps.build.outputs.digest }}
-    
-    steps:
-      - uses: actions/checkout@v3
-      
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v2
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-          
-      - name: Extract metadata for Docker
-        id: meta
-        uses: docker/metadata-action@v4
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          tags: |
-            type=raw,value=${{ env.IMAGE_TAG }}
-          
-      - name: Build and push Docker image
-        id: build
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-
-  security-scan:
-    needs: docker-build-push
-    runs-on: ubuntu-latest
-    
-    steps:
-      - uses: actions/checkout@v3
-      
-      - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@master
-        with:
-          image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
-          format: 'table'
-          exit-code: '1'
-          ignore-unfixed: true
-          vuln-type: 'os,library'
-          severity: 'CRITICAL,HIGH'
-          ignorefile: .trivyignore
-```
-
-・commitする
 
 [//]: # (CVEがなんなのかとかはスライドの方で説明します)
 ・github actionsのステータスを確認すると、セキュリティテストで失敗していることがわかる(CVE-2024-21538)
-
-[//]: # (最初のissueがCIが通るところまでをスコープにするので削除)
-~~・上記CVE対応のissueを作成する~~
-
----
-[//]: # (最初のissueがCIが通るところまでをスコープにするので削除)
-~~・「patch」というブランチを作成~~
-
-・まず、「.github/workflows/ci-cd.yml」ファイルを編集する(差分はCodespaces上か、GitHubで確認)
-
-node-version: '18' を node-version: '23' に変更する
-
-・次に、「Dockerfile」ファイルを編集する(差分はCodespaces上か、GitHubで確認)
-
-FROM node:18-slim を FROM node:23-slim に変更する
-
-・一度commitする
-
-・CIが通ることの確認
-
-・pull request作成
-
-~~・テストがクリアしたことを確認する。~~
-
-・開発者②にapproveしてもらう
-
