@@ -1,36 +1,173 @@
+*ハンズオンの手順の参照とハンズオンの実施は、ブラウザで別タブか別ウィンドウを開いて行うことをおすすめします。  
+*二人一組を想定(開発者とレビューア)していますが、一人でも実施可能です。
+
 # devflow-handson
 
-簡易な手順
+## 事前準備
 
-・以下のレポジトリをimportする(repository nameは `devflow-training` )  
+1. 以下のレポジトリをimportします。Owner は ご自身のユーザスペース or ユーザアカウントを選択してください。repository name は `devflow-training` とします。  
+   また、Repository は `Public` で作成します。  
 URL：https://github.com/k-magrudertest1/chat-app-demo.git
 
-・issueを作成する  
- ・誰がチャットにコメントしたのか分かりづらいのでユーザ名が表示されるように変更する  
-　　・テストも変更する  
+画像?
 
-・GitHub Packageにpushされたdockerコンテナイメージを以下の環境でpullする  
-https://shell.cloud.google.com/
+1. 以下のように「devflow-training」という Repository が表示されていればokです。
 
-ex. docker pull ghcr.io/k-magrudertest1/dev-flow-handson:run-1
+画像?
 
-・以下のコマンドでアプリを実行する
+## テストの追加と機能追加
 
-ex. docker run -d -p 3001:3000 ghcr.io/k-magrudertest1/dev-flow-handson:run-1
+1. 「devflow-training」という Repository で作業します。
 
-・「ウェブでプレビュー」で3001ポートでアクセスする
+1. 画面の左上タブの「<> Code」が選択されていることを確認してください。
 
-・アプリを止める
+1. 「main」と表示されている部分をクリックします。
 
-ex. docker rm -f $(docker ps -qa)
+1. 「Find or create a branch」に `feature/show-username` と入力します。
+
+1. 「Create branch *feature/show-username* from *main*」をクリックします。
+
+1. 画面右側、緑色で表示されている「<> Code」をクリックし、「Create codespace on feature/show-user...」をクリックします。
 
 ---
 
-・「useradd」というブランチを作成
+1. codespace が起動されたら、ターミナルで現在のアプリの状態を確認します。
 
-・Codespacesでファイルを編集する
+1. codespace 内のターミナルで、以下のコマンドを実行し、現状テストにクリアすることを確認します。(テストファイルが2件、テスト項目6件がクリアしていることがわかります。)
+   テストを確認後、「q」を押下することで、再度プロンプトを表示することができます。
 
-・まず、「tests/messageHandler.test.js」ファイルを編集する(以下のファイルを丸ごとコピペ⇒差分はCodespaces上か、GitHubで確認)
+```
+npm test
+```
+
+1. codespace 内のターミナルで、以下のコマンドを実行し、コンテナイメージをビルドします。
+
+```
+docker build -t test:1 .
+```
+
+1. 以下のコマンドで、コンテナイメージが作成されたことを確認します。
+
+```
+docker image ls
+```
+
+1. 以下のコマンドで、先ほど作成したコンテナイメージを使用し、コンテナを起動します。
+
+```
+docker run -dp 3000:3000 test:1
+```
+
+1. 以下のコマンドで、コンテが起動したことを確認します。
+
+```
+docker ps
+```
+
+1. 画面右下にポップアップが表示されます。「ブラウザーで開く」をクリックします。
+
+1. 「メッセージを入力」に文字を入力し、「送信」をクリックすることで、入力したメッセージが表示されるシンプルなチャットアプリです。
+
+1. 以下のコマンドで、先ほど起動したコンテナを削除します。
+
+```
+docker rm -f $(docker ps -qa)
+```
+
+---
+
+[//]: # (TODO: テストメソッド名は日本語にします。僕の方でやります)
+
+1. はじめに、「tests/messageHandler.test.js」ファイルを編集します。(以下のファイルをコピー&ペーストし、差分を確認します)
+
+```
+import { describe, it, expect } from 'vitest';
+import messageHandler from '../src/messageHandler';
+
+describe('MessageHandler', () => {
+  describe('validateMessage', () => {
+    it('should return false for empty message', () => {
+      const data = { username: 'test', message: '' };
+      expect(messageHandler.validateMessage(data)).toBe(false);
+    });
+
+    it('should return false for empty username', () => {
+      const data = { username: '', message: 'hello' };
+      expect(messageHandler.validateMessage(data)).toBe(false);
+    });
+
+    it('should return false for missing fields', () => {
+      const data = { username: 'test' };
+      expect(messageHandler.validateMessage(data)).toBe(false);
+    });
+
+    it('should return true for valid message', () => {
+      const data = { username: 'test', message: 'hello' };
+      expect(messageHandler.validateMessage(data)).toBe(true);
+    });
+  });
+
+  describe('formatMessage', () => {
+    it('should format message correctly', () => {
+      const data = { message: 'hello' };
+      const result = messageHandler.formatMessage(data);
+      
+      expect(result).toEqual({
+        message: 'hello',
+        timestamp: expect.any(String)
+      });
+    });
+
+    it('should trim whitespace', () => {
+      const data = { message: ' hello ' };
+      const result = messageHandler.formatMessage(data);
+      
+      expect(result).toEqual({
+        message: 'hello',
+        timestamp: expect.any(String)
+      });
+    });
+  });
+});
+```
+
+1. codespace 内のターミナルで、以下のコマンドを実行し、テストを行います。(テストファイル1件、うちテスト項目1件が failed となっていることがわかります。)
+   テストを確認後、「q」を押下することで、再度プロンプトを表示することができます。
+
+```
+npm test
+```
+
+1. 「src/messageHandler.js」ファイルを編集します。(以下のファイルをコピー&ペーストし、差分を確認します)
+
+```
+class MessageHandler {
+  validateMessage(data) {
+    if (!data.username || !data.message) {
+      return false;
+    }
+    return data.username.trim().length > 0 && data.message.trim().length > 0;
+  }
+
+  formatMessage(data) {
+    return {
+      message: data.message.trim(),
+      timestamp: new Date().toISOString()
+    };
+  }
+}
+
+module.exports = new MessageHandler();
+```
+
+1. codespace 内のターミナルで、以下のコマンドを実行し、テストを行います。(テスト項目がクリアしたことがわかります。)
+   テストを確認後、「q」を押下することで、再度プロンプトを表示することができます。
+
+```
+npm test
+```
+
+1. 再び、「tests/messageHandler.test.js」ファイルを編集します。(以下のファイルをコピー&ペーストし、差分を確認します)
 
 ```
 import { describe, it, expect } from 'vitest';
@@ -85,80 +222,37 @@ describe('MessageHandler', () => {
 });
 ```
 
-・次に、「tests/server.test.js」ファイルを編集する(以下のファイルを丸ごとコピペ⇒差分はCodespaces上か、GitHubで確認)
+1. codespace 内のターミナルで、以下のコマンドを実行し、テストを行います。(テストファイル1件、うちテスト項目2件が failed となっていることがわかります。)
+   テストを確認後、「q」を押下することで、再度プロンプトを表示することができます。
 
 ```
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { createServer } from 'http';
-import { Server } from 'socket.io';
-import Client from 'socket.io-client';
-import { app } from '../server';
-
-describe('Chat Server', () => {
-  let io, serverSocket, clientSocket;
-
-  beforeAll((done) => {
-    const httpServer = createServer(app);
-    io = new Server(httpServer);
-    httpServer.listen(() => {
-      const port = httpServer.address().port;
-      clientSocket = new Client(`http://localhost:${port}`);
-      io.on('connection', (socket) => {
-        serverSocket = socket;
-      });
-      clientSocket.on('connect', done);
-    });
-  });
-
-  afterAll(() => {
-    io.close();
-    clientSocket.close();
-  });
-
-  it('should receive and broadcast chat messages', (done) => {
-    const testMessage = {
-      username: 'testUser',
-      message: 'Hello, World!'
-    };
-
-    clientSocket.on('chat message', (data) => {
-      expect(data.username).toBe(testMessage.username);
-      expect(data.message).toBe(testMessage.message);
-      expect(data.timestamp).toBeDefined();
-      done();
-    });
-
-    clientSocket.emit('chat message', testMessage);
-  });
-
-  it('should not broadcast invalid messages', (done) => {
-    const invalidMessage = {
-      username: '',
-      message: ''
-    };
-
-    let messageReceived = false;
-    clientSocket.on('chat message', () => {
-      messageReceived = true;
-    });
-
-    clientSocket.emit('chat message', invalidMessage);
-
-    setTimeout(() => {
-      expect(messageReceived).toBe(false);
-      done();
-    }, 100);
-  });
-});
+npm test
 ```
 
-・一度commitする
+1. 「src/messageHandler.js」ファイルを編集します。(以下のファイルをコピー&ペーストし、差分を確認します)
 
-・pull request作成
+```
+class MessageHandler {
+  validateMessage(data) {
+    if (!data.username || !data.message) {
+      return false;
+    }
+    return data.username.trim().length > 0 && data.message.trim().length > 0;
+  }
 
-・テストは、usernameがあることを前提に書かれているが、まだアプリに反映していないので、パイプラインはテストで失敗する。
+  formatMessage(data) {
+    return {
+      username: data.username.trim(),
+      message: data.message.trim(),
+      timestamp: new Date().toISOString()
+    };
+  }
+}
 
-・まず、「public/index.html」ファイルを編集する(以下のファイルを丸ごとコピペ⇒差分はCodespaces上か、GitHubで確認)
+module.exports = new MessageHandler();
+```
+
+1. 「public/index.html」ファイルを編集します。(以下のファイルをコピー&ペーストし、差分を確認します)
 
 ```
 <!DOCTYPE html>
@@ -226,64 +320,128 @@ describe('Chat Server', () => {
 </html>
 ```
 
-・次に、「src/messageHandler.js」ファイルを編集する(以下のファイルを丸ごとコピペ⇒差分はCodespaces上か、GitHubで確認)
+1. codespace 内のターミナルで、以下のコマンドを実行し、テストを行います。(テスト項目がクリアしたことがわかります。)
+   テストを確認後、「q」を押下することで、再度プロンプトを表示することができます。
 
 ```
-class MessageHandler {
-  validateMessage(data) {
-    if (!data.username || !data.message) {
-      return false;
-    }
-    return data.username.trim().length > 0 && data.message.trim().length > 0;
-  }
-
-  formatMessage(data) {
-    return {
-      username: data.username.trim(),
-      message: data.message.trim(),
-      timestamp: new Date().toISOString()
-    };
-  }
-}
-
-module.exports = new MessageHandler();
+npm test
 ```
-
-・commitする
-
-・テストがクリアしたことを確認し、mergeする(ブランチも消す)
 
 ---
 
-・GitHub Packageにpushされた新たなdockerコンテナイメージを以下の環境でpullする  
-https://shell.cloud.google.com/
+1. codespace 内のターミナルで、以下のコマンドを実行し、変更したコードで改めてコンテナイメージをビルドします。
 
-ex. docker pull ghcr.io/k-magrudertest1/dev-flow-handson:run-4
+```
+docker build -t test:2 .
+```
 
-・以下のコマンドでアプリを実行する
+1. 以下のコマンドで、コンテナイメージが作成されたことを確認します。
 
-ex. docker run -d -p 3001:3000 ghcr.io/k-magrudertest1/dev-flow-handson:run-4
+```
+docker image ls
+```
 
-・「ウェブでプレビュー」で3001ポートでアクセスする（ユーザ名を入力し、チャットにコメントをするとユーザ名が表示されるようになったことを確認）
+1. 以下のコマンドで、先ほど作成したコンテナイメージを使用し、コンテナを起動します。
 
-・アプリを止める
+```
+docker run -dp 3000:3000 test:2
+```
 
-ex. docker rm -f $(docker ps -qa)
+1. 以下のコマンドで、コンテが起動したことを確認します。
+
+```
+docker ps
+```
+
+1. 画面右下にポップアップが表示されます。「ブラウザーで開く」をクリックします。
+
+1. ポップアップで、「ユーザー名を入力してください」と表示されます。任意のユーザー名を入力してください。
+
+1. 次に、「メッセージを入力」に文字を入力し、「送信」をクリックすることで、先ほど入力したユーザー名と、入力したメッセージが表示されます。
+
+1. 以下のコマンドで、先ほど起動したコンテナを削除します。
+
+```
+docker rm -f $(docker ps -qa)
+```
+
+1. ここで、変更作業を commit して、push します。コミットメッセージを入力して、「コミット」をクリックします。
+
+1. 「変更の同期」をクリックします。
 
 ---
 
-・「.github/workflows/ci-cd.yml」を編集する(セキュリティスキャンを追加)
+1. codespace から抜けて、「devflow-training」という Repository に戻ります。
 
-・以下のファイルを丸ごとコピペ⇒差分はCodespaces上か、GitHubで確認
+1. 「feature/show-username」ブランチ上で作業します。
+
+1. 「Actions」タブをクリックします。
+
+1. 先ほど コミット したことで実行されたパイプラインのステータスを確認します。(パイプラインが失敗していないことを確認します。)
+
+1. 「feature/show-username」ブランチ上で、pull request を作成します。
+
+1. 作成した pull request に Reviewers を追加します。(追加されたユーザーがレビューを行います)
+
+---
+
+[//]: # (TODO: 複数メンバー前提にしたいので、ここで開発者②がコメントを入れて承認するという流れを追加したいです) → ok だと思うのですが、今思うとレビューアってほとんどやることない気が,,,
+
+**<↓レビューア作業ここから↓>**
+
+1. レビューアは、作成された pull request を開きます。
+
+1. 「Add your review」をクリックします。
+
+1. 変更内容を確認したら、「Review changes」をクリックし、「問題なさそうですb」とコメントを記し、「Approve」を選択して、「Submit review」をクリックします。
+
+**<↑レビューア作業ここまで↑>**
+
+---
+
+1. 開発者は、レビューアから Approved されたことを確認します。
+
+1. 「Merge pull request」をクリックします。
+
+1. 「Confirm merge」をクリックします。
+
+1. 「Delete branch」をクリックします。
+
+1. 「Delete codespace」をクリックします。
+
+1. 「Actions」タブをクリックします。
+
+1. 先ほど pull request をマージしたことで実行されたパイプラインのステータスを確認します。(パイプラインが失敗していないことを確認します。)
+
+---
+
+## セキュリティスキャンの追加とCVEの対応
+
+1. 「devflow-training」という Repository で作業します。
+
+1. 画面の左上タブの「<> Code」が選択されていることを確認してください。
+
+1. 「main」と表示されている部分をクリックします。
+
+1. 「Find or create a branch」に `feature/introduce-trivy-pipeline` と入力します。
+
+1. 「Create branch *feature/introduce-trivy-pipeline* from *main*」をクリックします。
+
+1. 画面右側、緑色で表示されている「<> Code」をクリックし、「Create codespace on feature/introduce-tri...」をクリックします。
+
+---
+
+1. 「.github/workflows/ci-cd.yml」ファイルを編集します。(以下のファイルをコピー&ペーストし、差分を確認します)
 
 ```
 name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ main ]
+    branches: [ 'feature/**' ]
   pull_request:
-    branches: [ main ]
+    types: [ closed ]
+    branches: [ 'main' ]
 
 env:
   REGISTRY: ghcr.io
@@ -364,28 +522,71 @@ jobs:
           ignorefile: .trivyignore
 ```
 
-・commitする
+1. ここで、変更作業を commit して、push します。コミットメッセージを入力して、「コミット」をクリックします。
 
-・github actionsのステータスを確認すると、セキュリティテストで失敗していることがわかる(CVE-2024-21538)
-
-・上記CVE対応のissueを作成する
+1. 「変更の同期」をクリックします。
 
 ---
 
-・「patch」というブランチを作成
+1. codespace から抜けて、「devflow-training」という Repository に戻ります。
 
-・まず、「.github/workflows/ci-cd.yml」ファイルを編集する(差分はCodespaces上か、GitHubで確認)
+1. 「feature/introduce-trivy-pipeline」ブランチ上で作業します。
 
-node-version: '18' を node-version: '23' に変更する
+1. 「Actions」タブをクリックします。
 
-・次に、「Dockerfile」ファイルを編集する(差分はCodespaces上か、GitHubで確認)
+1. 先ほど コミット したことで実行されたパイプラインのステータスを確認します。(追加したセキュリティスキャンが失敗していることを確認します。)
 
-FROM node:18-slim を FROM node:23-slim に変更する
+---
 
-・一度commitする
+1. codespaceに戻ります。
 
-・pull request作成
+1. まず、「.github/workflows/ci-cd.yml」ファイルを編集します。( `node-version: '18'` を `node-version: '23'` に変更してください。)
 
-・テストがクリアしたことを確認する。
+1. 次に、「Dockerfile」ファイルを編集します。(FROM node:18-slim を FROM node:23-slim に変更してください。)
 
+1. 変更作業を commit して、push します。コミットメッセージを入力して、「コミット」をクリックします。
+
+1. 「変更の同期」をクリックします。
+
+---
+
+1. codespace から抜けて、「devflow-training」という Repository に戻ります。
+
+1. 「feature/introduce-trivy-pipeline」ブランチ上で作業します。
+
+1. 「Actions」タブをクリックします。
+
+1. 先ほど コミット したことで実行されたパイプラインのステータスを確認します。(パイプラインが失敗していないことを確認します。)
+
+1. 「feature/introduce-trivy-pipeline」ブランチ上で、pull request を作成します。
+
+1. 作成した pull request に Reviewers を追加します。(追加されたユーザーがレビューを行います)
+
+---
+
+**<↓レビューア作業ここから↓>**
+
+1. レビューアは、作成された pull request を開きます。
+
+1. 「Add your review」をクリックします。
+
+1. 変更内容を確認したら、「Review changes」をクリックし、「問題なさそうですb」とコメントを記し、「Approve」を選択して、「Submit review」をクリックします。
+
+**<↑レビューア作業ここまで↑>**
+
+---
+
+1. 開発者は、レビューアから Approved されたことを確認します。
+
+1. 「Merge pull request」をクリックします。
+
+1. 「Confirm merge」をクリックします。
+
+1. 「Delete branch」をクリックします。
+
+1. 「Delete codespace」をクリックします。
+
+1. 「Actions」タブをクリックします。
+
+1. 先ほど pull request をマージしたことで実行されたパイプラインのステータスを確認します。(パイプラインが失敗していないことを確認します。)
 
