@@ -5,74 +5,82 @@
 
 ## 0.事前準備
 
-1. 以下のレポジトリをimportします。Owner は ご自身のユーザスペース or ユーザアカウントを選択してください。repository name は `devflow-training` とします。  
+0-1. 以下のレポジトリをimportします。Owner は ご自身のユーザスペース or ユーザアカウントを選択してください。repository name は `devflow-training` とします。  
    また、Repository は `Public` で作成します。  
 URL：https://github.com/k-magrudertest1/chat-app-demo.git
 
-1. 「devflow-training」という Repository が表示されていればokです。
+0-2. 「devflow-training」という Repository が表示されていればokです。
 
-1. Settings > General > Collaboraors にて、「Add people」をクリックし、共同作業者を招待します。
+0-3. Settings > General > Collaboraors にて、「Add people」をクリックし、共同作業者を招待します。
 
-2. 「Add <共同作業者>」をクリックします。
+0-4. 「Add <共同作業者>」をクリックします。
 
 ![0-1.jpg](./img/0/0-1.jpg)
 
-3. Repository に招待された旨の通知が共同作業者に届きます。「Accept invitation」をクリックします。
+0-5. Repository に招待された旨の通知が共同作業者に届きます。「Accept invitation」をクリックします。
 
 ![0-2.jpg](./img/0/0-2.jpg)
 
-4. 「Accept invitation」をクリックします。
+0-6. 「Accept invitation」をクリックします。
 
 ![0-3.jpg](./img/0/0-3.jpg)
 
 ## 1.テストの追加と機能追加
 
-1. 「devflow-training」という Repository で作業します。
+1-1. 「devflow-training」という Repository で作業します。
 
-1. 画面の左上タブの「<> Code」が選択されていることを確認してください。
+1-2. 画面の左上タブの「<> Code」が選択されていることを確認してください。
 
-1. 「main」と表示されている部分をクリックします。
+1-3. 「main」と表示されている部分をクリックします。
 
-1. 「Find or create a branch」に `feature/show-username` と入力します。
+1-4. 「Find or create a branch」に `feature/show-username` と入力します。
 
-1. 「Create branch *feature/show-username* from *main*」をクリックします。
+1-5. 「Create branch *feature/show-username* from *main*」をクリックします。
 
-1. 画面右側、緑色で表示されている「<> Code」をクリックし、「Create codespace on feature/show-user...」をクリックします。
+1-6. 画面右側、緑色で表示されている「<> Code」をクリックし、「Create codespace on feature/show-user...」をクリックします。
+
+![1-1.jpg](./img/1/1-1.jpg)
 
 ---
 
-1. codespace が起動されたら、ターミナルで現在のアプリの状態を確認します。
+1-7. codespace が起動されたら、ターミナルで現在のアプリの状態を確認します。
 
-1. codespace 内のターミナルで、以下のコマンドを実行し、現状テストにクリアすることを確認します。(テストファイルが2件、テスト項目6件がクリアしていることがわかります。)
+1-8. codespace 内のターミナルで、以下のコマンドを実行し、現状テストにクリアすることを確認します。(テストファイルが2件、テスト項目6件がクリアしていることがわかります。)
    テストを確認後、「q」を押下することで、再度プロンプトを表示することができます。
 
 ```
 npm test
 ```
 
-1. codespace 内のターミナルで、以下のコマンドを実行し、コンテナイメージをビルドします。
+![1-2.jpg](./img/1/1-2.jpg)
+
+1-9. codespace 内のターミナルで、以下のコマンドを実行し、コンテナイメージをビルドします。
 
 ```
 docker build -t test:1 .
 ```
 
-1. 以下のコマンドで、コンテナイメージが作成されたことを確認します。
+1-10. 以下のコマンドで、コンテナイメージが作成されたことを確認します。
 
 ```
 docker image ls
 ```
 
-1. 以下のコマンドで、先ほど作成したコンテナイメージを使用し、コンテナを起動します。
+1-11. 以下のコマンドで、先ほど作成したコンテナイメージを使用し、コンテナを起動します。
 
 ```
 docker run -dp 3000:3000 test:1
 ```
 
-1. 画面右下にポップアップが表示されます。「ブラウザーで開く」をクリックします。
+1-12. 画面右下にポップアップが表示されます。「ブラウザーで開く」をクリックします。
 
-1. 「メッセージを入力」に文字を入力し、「送信」をクリックすることで、入力したメッセージが表示されるシンプルなチャットアプリです。
+![1-3.jpg](./img/1/1-3.jpg)
 
-1. 以下のコマンドで、先ほど起動したコンテナを削除します。
+1-13. 「メッセージを入力」に文字を入力し、「送信」をクリックすることで、入力したメッセージが表示されるシンプルなチャットアプリです。
+
+![1-4.jpg](./img/1/1-4.jpg)
+
+1-14. 以下のコマンドで、先ほど起動したコンテナを削除します。
 
 ```
 docker rm -f $(docker ps -qa)
@@ -80,9 +88,7 @@ docker rm -f $(docker ps -qa)
 
 ---
 
-[//]: # (TODO: テストメソッド名は日本語にします。僕の方でやります)
-
-1. はじめに、「tests/messageHandler.test.js」ファイルを編集します。(以下のファイルをコピー&ペーストし、差分を確認します)
+1-15. はじめに、「tests/messageHandler.test.js」ファイルを編集します。(以下のファイルをコピー&ペーストし、差分を確認します)
 
 ```
 import { describe, it, expect } from 'vitest';
@@ -135,14 +141,16 @@ describe('MessageHandler', () => {
 });
 ```
 
-1. codespace 内のターミナルで、以下のコマンドを実行し、テストを行います。(テストファイル1件、うちテスト項目1件が failed となっていることがわかります。)
+1-16. codespace 内のターミナルで、以下のコマンドを実行し、テストを行います。(テストファイル1件、うちテスト項目1件が failed となっていることがわかります。)
    テストを確認後、「q」を押下することで、再度プロンプトを表示することができます。
 
 ```
 npm test
 ```
 
-1. 「src/messageHandler.js」ファイルを編集します。(以下のファイルをコピー&ペーストし、差分を確認します)
+![1-5.jpg](./img/1/1-5.jpg)
+
+1-17. 「src/messageHandler.js」ファイルを編集します。(以下のファイルをコピー&ペーストし、差分を確認します)
 
 ```
 class MessageHandler {
@@ -164,14 +172,14 @@ class MessageHandler {
 module.exports = new MessageHandler();
 ```
 
-1. codespace 内のターミナルで、以下のコマンドを実行し、テストを行います。(テスト項目がクリアしたことがわかります。)
+1-18. codespace 内のターミナルで、以下のコマンドを実行し、テストを行います。(テスト項目がクリアしたことがわかります。)
    テストを確認後、「q」を押下することで、再度プロンプトを表示することができます。
 
 ```
 npm test
 ```
 
-1. 再び、「tests/messageHandler.test.js」ファイルを編集します。(以下のファイルをコピー&ペーストし、差分を確認します)
+1-19. 再び、「tests/messageHandler.test.js」ファイルを編集します。(以下のファイルをコピー&ペーストし、差分を確認します)
 
 ```
 import { describe, it, expect } from 'vitest';
@@ -226,14 +234,16 @@ describe('MessageHandler', () => {
 });
 ```
 
-1. codespace 内のターミナルで、以下のコマンドを実行し、テストを行います。(テストファイル1件、うちテスト項目2件が failed となっていることがわかります。)
+1-20. codespace 内のターミナルで、以下のコマンドを実行し、テストを行います。(テストファイル1件、うちテスト項目2件が failed となっていることがわかります。)
    テストを確認後、「q」を押下することで、再度プロンプトを表示することができます。
 
 ```
 npm test
 ```
 
-1. 「src/messageHandler.js」ファイルを編集します。(以下のファイルをコピー&ペーストし、差分を確認します)
+![1-6.jpg](./img/1/1-6.jpg)
+
+1-21. 「src/messageHandler.js」ファイルを編集します。(以下のファイルをコピー&ペーストし、差分を確認します)
 
 ```
 class MessageHandler {
@@ -256,7 +266,7 @@ class MessageHandler {
 module.exports = new MessageHandler();
 ```
 
-1. 「public/index.html」ファイルを編集します。(以下のファイルをコピー&ペーストし、差分を確認します)
+1-22. 「public/index.html」ファイルを編集します。(以下のファイルをコピー&ペーストし、差分を確認します)
 
 ```
 <!DOCTYPE html>
@@ -324,7 +334,7 @@ module.exports = new MessageHandler();
 </html>
 ```
 
-1. codespace 内のターミナルで、以下のコマンドを実行し、テストを行います。(テスト項目がクリアしたことがわかります。)
+1-23. codespace 内のターミナルで、以下のコマンドを実行し、テストを行います。(テスト項目がクリアしたことがわかります。)
    テストを確認後、「q」を押下することで、再度プロンプトを表示することができます。
 
 ```
@@ -333,103 +343,119 @@ npm test
 
 ---
 
-1. codespace 内のターミナルで、以下のコマンドを実行し、変更したコードで改めてコンテナイメージをビルドします。
+1-24. codespace 内のターミナルで、以下のコマンドを実行し、変更したコードで改めてコンテナイメージをビルドします。
 
 ```
 docker build -t test:2 .
 ```
 
-1. 以下のコマンドで、コンテナイメージが作成されたことを確認します。
+1-25. 以下のコマンドで、コンテナイメージが作成されたことを確認します。
 
 ```
 docker image ls
 ```
 
-1. 以下のコマンドで、先ほど作成したコンテナイメージを使用し、コンテナを起動します。
+1-26. 以下のコマンドで、先ほど作成したコンテナイメージを使用し、コンテナを起動します。
 
 ```
 docker run -dp 3000:3000 test:2
 ```
 
-1. 画面右下にポップアップが表示されます。「ブラウザーで開く」をクリックします。
+1-27. 画面右下にポップアップが表示されます。「ブラウザーで開く」をクリックします。
 
-1. ポップアップで、「ユーザー名を入力してください」と表示されます。任意のユーザー名を入力してください。
+1-28. ポップアップで、「ユーザー名を入力してください」と表示されます。任意のユーザー名を入力してください。
 
-1. 次に、「メッセージを入力」に文字を入力し、「送信」をクリックすることで、先ほど入力したユーザー名と、入力したメッセージが表示されます。
+![1-7.jpg](./img/1/1-7.jpg)
 
-1. 以下のコマンドで、先ほど起動したコンテナを削除します。
+1-29. 次に、「メッセージを入力」に文字を入力し、「送信」をクリックすることで、先ほど入力したユーザー名と、入力したメッセージが表示されます。
+
+![1-8.jpg](./img/1/1-8.jpg)
+
+1-30. 以下のコマンドで、先ほど起動したコンテナを削除します。
 
 ```
 docker rm -f $(docker ps -qa)
 ```
 
-1. ここで、変更作業を commit して、push します。コミットメッセージを入力して、「コミット」をクリックします。
+1-31. ここで、変更作業を commit して、push します。コミットメッセージを入力して、「コミット」をクリックします。
 
-1. 「変更の同期」をクリックします。
+![1-9.jpg](./img/1/1-9.jpg)
 
----
+1-32. 「変更の同期」をクリックします。
 
-1. codespace から抜けて、「devflow-training」という Repository に戻ります。
-
-1. 「feature/show-username」ブランチ上で作業します。
-
-1. 「Actions」タブをクリックします。
-
-1. 先ほど コミット したことで実行されたパイプラインのステータスを確認します。(パイプラインが失敗していないことを確認します。)
-
-1. 「feature/show-username」ブランチ上で、pull request を作成します。
-
-1. 作成した pull request の Reviewers に共同作業者を追加します。(追加された共同作業者がレビューを行います)
+![1-10.jpg](./img/1/1-10.jpg)
 
 ---
 
-[//]: # (TODO: 複数メンバー前提にしたいので、ここで開発者②がコメントを入れて承認するという流れを追加したいです) → ok だと思うのですが、今思うとレビューアってほとんどやることない気が,,,
+1-33. codespace から抜けて、「devflow-training」という Repository に戻ります。
+
+1-34. 「feature/show-username」ブランチ上で作業します。
+
+1-35. 「Actions」タブをクリックします。
+
+1-36. 先ほど コミット したことで実行されたパイプラインのステータスを確認します。(パイプラインが失敗していないことを確認します。)
+
+![1-11.jpg](./img/1/1-11.jpg)
+
+1-37. 「feature/show-username」ブランチ上で、pull request を作成します。
+
+1-38. 作成した pull request の Reviewers に共同作業者を追加します。(追加された共同作業者がレビューを行います)
+
+![1-12.jpg](./img/1/1-12.jpg)
+
+---
 
 **<↓レビューア作業ここから↓>**
 
-1. レビューアは、作成された pull request を開きます。
+1-39. レビューアは、作成された pull request を開きます。
 
-1. 「Add your review」をクリックします。
+1-40. 「Add your review」をクリックします。
 
-1. 変更内容を確認したら、「Review changes」をクリックし、「問題なさそうですb」とコメントを記し、「Approve」を選択して、「Submit review」をクリックします。
+![1-13.jpg](./img/1/1-13.jpg)
+
+1-41. 変更内容を確認したら、「Review changes」をクリックし、「問題なさそうですb」とコメントを記し、「Approve」を選択して、「Submit review」をクリックします。
+
+![1-14.jpg](./img/1/1-14.jpg)
 
 **<↑レビューア作業ここまで↑>**
 
 ---
 
-1. 開発者は、レビューアから Approved されたことを確認します。
+1-42. 開発者は、レビューアから Approved されたことを確認します。
 
-1. 「Merge pull request」をクリックします。
+1-43. 「Merge pull request」をクリックします。
 
-1. 「Confirm merge」をクリックします。
+1-44. 「Confirm merge」をクリックします。
 
-1. 「Delete branch」をクリックします。
+1-45. 「Delete branch」をクリックします。
 
-1. 「Delete codespace」をクリックします。
+1-46. 「Delete codespace」をクリックします。
 
-1. 「Actions」タブをクリックします。
+1-47. 「Actions」タブをクリックします。
 
-1. 先ほど pull request をマージしたことで実行されたパイプラインのステータスを確認します。(パイプラインが失敗していないことを確認します。)
+1-48. 先ほど pull request をマージしたことで実行されたパイプラインのステータスを確認します。(パイプラインが失敗していないことを確認します。)
+
+![1-15.jpg](./img/1/1-15.jpg)
 
 ---
 
 ## 2.セキュリティスキャンの追加とCVEの対応
 
-1. 「devflow-training」という Repository で作業します。
+2-1. 「devflow-training」という Repository で作業します。
 
-1. 画面の左上タブの「<> Code」が選択されていることを確認してください。
+2-2. 画面の左上タブの「<> Code」が選択されていることを確認してください。
 
-1. 「main」と表示されている部分をクリックします。
+2-3. 「main」と表示されている部分をクリックします。
 
-1. 「Find or create a branch」に `feature/introduce-trivy-pipeline` と入力します。
+2-4. 「Find or create a branch」に `feature/introduce-trivy-pipeline` と入力します。
 
-1. 「Create branch *feature/introduce-trivy-pipeline* from *main*」をクリックします。
+2-5. 「Create branch *feature/introduce-trivy-pipeline* from *main*」をクリックします。
 
-1. 画面右側、緑色で表示されている「<> Code」をクリックし、「Create codespace on feature/introduce-t...」をクリックします。
+2-6. 画面右側、緑色で表示されている「<> Code」をクリックし、「Create codespace on feature/introduce-t...」をクリックします。
 
 ---
 
-1. 「.github/workflows/ci-cd.yml」ファイルを編集します。(以下のファイルをコピー&ペーストし、差分を確認します)
+2-7. 「.github/workflows/ci-cd.yml」ファイルを編集します。(以下のファイルをコピー&ペーストし、差分を確認します)
 
 ```
 name: CI/CD Pipeline
@@ -520,70 +546,74 @@ jobs:
           ignorefile: .trivyignore
 ```
 
-1. ここで、変更作業を commit して、push します。コミットメッセージを入力して、「コミット」をクリックします。
+2-8. ここで、変更作業を commit して、push します。コミットメッセージを入力して、「コミット」をクリックします。
 
-1. 「変更の同期」をクリックします。
-
----
-
-1. codespace から抜けて、「devflow-training」という Repository に戻ります。
-
-1. 「feature/introduce-trivy-pipeline」ブランチ上で作業します。
-
-1. 「Actions」タブをクリックします。
-
-1. 先ほど コミット したことで実行されたパイプラインのステータスを確認します。(追加したセキュリティスキャンが失敗していることを確認します。)
+2-9. 「変更の同期」をクリックします。
 
 ---
 
-1. codespaceに戻ります。
+2-10. codespace から抜けて、「devflow-training」という Repository に戻ります。
 
-1. まず、「.github/workflows/ci-cd.yml」ファイルを編集します。( `node-version: '18'` を `node-version: '23'` に変更してください。)
+2-11. 「feature/introduce-trivy-pipeline」ブランチ上で作業します。
 
-1. 次に、「Dockerfile」ファイルを編集します。( `FROM node:18-slim` を `FROM node:23-slim` に変更してください。)
+2-12. 「Actions」タブをクリックします。
 
-1. 変更作業を commit して、push します。コミットメッセージを入力して、「コミット」をクリックします。
+2-13. 先ほど コミット したことで実行されたパイプラインのステータスを確認します。(追加したセキュリティスキャンが失敗していることを確認します。)
 
-1. 「変更の同期」をクリックします。
+![2-1.jpg](./img/2/2-1.jpg)
 
 ---
 
-1. codespace から抜けて、「devflow-training」という Repository に戻ります。
+2-14. codespaceに戻ります。
 
-1. 「feature/introduce-trivy-pipeline」ブランチ上で作業します。
+2-15. まず、「.github/workflows/ci-cd.yml」ファイルを編集します。( `node-version: '18'` を `node-version: '23'` に変更してください。)
 
-1. 「Actions」タブをクリックします。
+2-16. 次に、「Dockerfile」ファイルを編集します。( `FROM node:18-slim` を `FROM node:23-slim` に変更してください。)
 
-1. 先ほど コミット したことで実行されたパイプラインのステータスを確認します。(パイプラインが失敗していないことを確認します。)
+2-17. 変更作業を commit して、push します。コミットメッセージを入力して、「コミット」をクリックします。
 
-1. 「feature/introduce-trivy-pipeline」ブランチ上で、pull request を作成します。
+2-18. 「変更の同期」をクリックします。
 
-1. 作成した pull request の Reviewers に共同作業者を追加します。(追加された共同作業者がレビューを行います)
+---
+
+2-19. codespace から抜けて、「devflow-training」という Repository に戻ります。
+
+2-20. 「feature/introduce-trivy-pipeline」ブランチ上で作業します。
+
+2-21. 「Actions」タブをクリックします。
+
+2-22. 先ほど コミット したことで実行されたパイプラインのステータスを確認します。(パイプラインが失敗していないことを確認します。)
+
+2-23. 「feature/introduce-trivy-pipeline」ブランチ上で、pull request を作成します。
+
+2-24. 作成した pull request の Reviewers に共同作業者を追加します。(追加された共同作業者がレビューを行います)
+
 ---
 
 **<↓レビューア作業ここから↓>**
 
-1. レビューアは、作成された pull request を開きます。
+2-25. レビューアは、作成された pull request を開きます。
 
-1. 「Add your review」をクリックします。
+2-26. 「Add your review」をクリックします。
 
-1. 変更内容を確認したら、「Review changes」をクリックし、「問題なさそうですb」とコメントを記し、「Approve」を選択して、「Submit review」をクリックします。
+2-27. 変更内容を確認したら、「Review changes」をクリックし、「問題なさそうですb」とコメントを記し、「Approve」を選択して、「Submit review」をクリックします。
 
 **<↑レビューア作業ここまで↑>**
 
 ---
 
-1. 開発者は、レビューアから Approved されたことを確認します。
+2-28. 開発者は、レビューアから Approved されたことを確認します。
 
-1. 「Merge pull request」をクリックします。
+2-29. 「Merge pull request」をクリックします。
 
-1. 「Confirm merge」をクリックします。
+2-30. 「Confirm merge」をクリックします。
 
-1. 「Delete branch」をクリックします。
+2-31. 「Delete branch」をクリックします。
 
-1. 「Delete codespace」をクリックします。
+2-32. 「Delete codespace」をクリックします。
 
-1. 「Actions」タブをクリックします。
+2-33. 「Actions」タブをクリックします。
 
-1. 先ほど pull request をマージしたことで実行されたパイプラインのステータスを確認します。(パイプラインが失敗していないことを確認します。)
+2-34. 先ほど pull request をマージしたことで実行されたパイプラインのステータスを確認します。(パイプラインが失敗していないことを確認します。)
 
+![2-2.jpg](./img/2/2-2.jpg)
