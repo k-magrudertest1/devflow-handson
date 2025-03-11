@@ -3,7 +3,7 @@
 
 # devflow-handson
 
-## 事前準備
+## 0.事前準備
 
 1. 以下のレポジトリをimportします。Owner は ご自身のユーザスペース or ユーザアカウントを選択してください。repository name は `devflow-training` とします。  
    また、Repository は `Public` で作成します。  
@@ -15,7 +15,13 @@ URL：https://github.com/k-magrudertest1/chat-app-demo.git
 
 画像?
 
-## テストの追加と機能追加
+1. Settings > General > Collaboraors にて、「Add people」をクリックし、共同作業者を招待します。
+
+2. 「Add <共同作業者>」をクリックします。
+
+3. Repository に招待された旨の通知が共同作業者に届きますので、「Accept invitation」をクリックします。
+
+## 1.テストの追加と機能追加
 
 1. 「devflow-training」という Repository で作業します。
 
@@ -56,12 +62,6 @@ docker image ls
 
 ```
 docker run -dp 3000:3000 test:1
-```
-
-1. 以下のコマンドで、コンテが起動したことを確認します。
-
-```
-docker ps
 ```
 
 1. 画面右下にポップアップが表示されます。「ブラウザーで開く」をクリックします。
@@ -347,12 +347,6 @@ docker image ls
 docker run -dp 3000:3000 test:2
 ```
 
-1. 以下のコマンドで、コンテが起動したことを確認します。
-
-```
-docker ps
-```
-
 1. 画面右下にポップアップが表示されます。「ブラウザーで開く」をクリックします。
 
 1. ポップアップで、「ユーザー名を入力してください」と表示されます。任意のユーザー名を入力してください。
@@ -381,7 +375,7 @@ docker rm -f $(docker ps -qa)
 
 1. 「feature/show-username」ブランチ上で、pull request を作成します。
 
-1. 作成した pull request に Reviewers を追加します。(追加されたユーザーがレビューを行います)
+1. 作成した pull request の Reviewers に共同作業者を追加します。(追加された共同作業者がレビューを行います)
 
 ---
 
@@ -415,7 +409,7 @@ docker rm -f $(docker ps -qa)
 
 ---
 
-## セキュリティスキャンの追加とCVEの対応
+## 2.セキュリティスキャンの追加とCVEの対応
 
 1. 「devflow-training」という Repository で作業します。
 
@@ -427,7 +421,7 @@ docker rm -f $(docker ps -qa)
 
 1. 「Create branch *feature/introduce-trivy-pipeline* from *main*」をクリックします。
 
-1. 画面右側、緑色で表示されている「<> Code」をクリックし、「Create codespace on feature/introduce-tri...」をクリックします。
+1. 画面右側、緑色で表示されている「<> Code」をクリックし、「Create codespace on feature/introduce-t...」をクリックします。
 
 ---
 
@@ -542,7 +536,7 @@ jobs:
 
 1. まず、「.github/workflows/ci-cd.yml」ファイルを編集します。( `node-version: '18'` を `node-version: '23'` に変更してください。)
 
-1. 次に、「Dockerfile」ファイルを編集します。(FROM node:18-slim を FROM node:23-slim に変更してください。)
+1. 次に、「Dockerfile」ファイルを編集します。( `FROM node:18-slim` を `FROM node:23-slim` に変更してください。)
 
 1. 変更作業を commit して、push します。コミットメッセージを入力して、「コミット」をクリックします。
 
@@ -560,8 +554,7 @@ jobs:
 
 1. 「feature/introduce-trivy-pipeline」ブランチ上で、pull request を作成します。
 
-1. 作成した pull request に Reviewers を追加します。(追加されたユーザーがレビューを行います)
-
+1. 作成した pull request の Reviewers に共同作業者を追加します。(追加された共同作業者がレビューを行います)
 ---
 
 **<↓レビューア作業ここから↓>**
