@@ -1,4 +1,4 @@
-*ハンズオンの手順の参照とハンズオンの実施は、ブラウザで別タブか別ウィンドウを開いて行うことをおすすめします。
+*ハンズオンの手順の参照とハンズオンの実施は、ブラウザで別タブか別ウィンドウを開いて行うことをおすすめします。  
 *二人一組を想定(開発者とレビューア)していますが、一人でも実施可能です。
 
 # devflow-handson
@@ -6,7 +6,7 @@
 ## 事前準備
 
 1. 以下のレポジトリをimportします。Owner は ご自身のユーザスペース or ユーザアカウントを選択してください。repository name は `devflow-training` とします。  
-   また、Repository は `Public` で作成します。
+   また、Repository は `Public` で作成します。  
 URL：https://github.com/k-magrudertest1/chat-app-demo.git
 
 画像?
@@ -16,8 +16,6 @@ URL：https://github.com/k-magrudertest1/chat-app-demo.git
 画像?
 
 ## テストの追加と機能追加
-
-[//]: # (TODO: 細かいですが、 feature/show-usernameにしてほしいです) → ok
 
 1. 「devflow-training」という Repository で作業します。
 
@@ -32,8 +30,6 @@ URL：https://github.com/k-magrudertest1/chat-app-demo.git
 1. 画面右側、緑色で表示されている「<> Code」をクリックし、「Create codespace on feature/show-user...」をクリックします。
 
 ---
-
-[//]: # (COMMENT: ここもcodespace内で完結すると思います) → ok
 
 1. codespace が起動されたら、ターミナルで現在のアプリの状態を確認します。
 
@@ -80,11 +76,98 @@ docker rm -f $(docker ps -qa)
 
 ---
 
-[//]: # (COMMENT: できるかわからないですが、テストコードを一つずつ変更して直すみたいな手順にできると嬉しいです。のちほど相談させて下さい！) 非常に申し訳ない、テストあとから書いたのでやってみようとしたのですがちょっとむずいです,,,
 [//]: # (TODO: テストメソッド名は日本語にします。僕の方でやります)
 
-
 1. はじめに、「tests/messageHandler.test.js」ファイルを編集します。(以下のファイルをコピー&ペーストし、差分を確認します)
+
+```
+import { describe, it, expect } from 'vitest';
+import messageHandler from '../src/messageHandler';
+
+describe('MessageHandler', () => {
+  describe('validateMessage', () => {
+    it('should return false for empty message', () => {
+      const data = { username: 'test', message: '' };
+      expect(messageHandler.validateMessage(data)).toBe(false);
+    });
+
+    it('should return false for empty username', () => {
+      const data = { username: '', message: 'hello' };
+      expect(messageHandler.validateMessage(data)).toBe(false);
+    });
+
+    it('should return false for missing fields', () => {
+      const data = { username: 'test' };
+      expect(messageHandler.validateMessage(data)).toBe(false);
+    });
+
+    it('should return true for valid message', () => {
+      const data = { username: 'test', message: 'hello' };
+      expect(messageHandler.validateMessage(data)).toBe(true);
+    });
+  });
+
+  describe('formatMessage', () => {
+    it('should format message correctly', () => {
+      const data = { message: 'hello' };
+      const result = messageHandler.formatMessage(data);
+      
+      expect(result).toEqual({
+        message: 'hello',
+        timestamp: expect.any(String)
+      });
+    });
+
+    it('should trim whitespace', () => {
+      const data = { message: ' hello ' };
+      const result = messageHandler.formatMessage(data);
+      
+      expect(result).toEqual({
+        message: 'hello',
+        timestamp: expect.any(String)
+      });
+    });
+  });
+});
+```
+
+1. codespace 内のターミナルで、以下のコマンドを実行し、テストを行います。(テストファイル1件、うちテスト項目1件が failed となっていることがわかります。)
+   テストを確認後、「q」を押下することで、再度プロンプトを表示することができます。
+
+```
+npm test
+```
+
+1. 「src/messageHandler.js」ファイルを編集します。(以下のファイルをコピー&ペーストし、差分を確認します)
+
+```
+class MessageHandler {
+  validateMessage(data) {
+    if (!data.username || !data.message) {
+      return false;
+    }
+    return data.username.trim().length > 0 && data.message.trim().length > 0;
+  }
+
+  formatMessage(data) {
+    return {
+      message: data.message.trim(),
+      timestamp: new Date().toISOString()
+    };
+  }
+}
+
+module.exports = new MessageHandler();
+```
+
+1. codespace 内のターミナルで、以下のコマンドを実行し、テストを行います。(テスト項目がクリアしたことがわかります。)
+   テストを確認後、「q」を押下することで、再度プロンプトを表示することができます。
+
+```
+npm test
+```
+
+1. 再び、「tests/messageHandler.test.js」ファイルを編集します。(以下のファイルをコピー&ペーストし、差分を確認します)
 
 ```
 import { describe, it, expect } from 'vitest';
@@ -139,75 +222,7 @@ describe('MessageHandler', () => {
 });
 ```
 
-1. 次に、「tests/server.test.js」ファイルを編集します。(以下のファイルをコピー&ペーストし、差分を確認します)
-[//]: # (TODO: テストメソッド名は日本語にします。僕の方でやります)
-
-```
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { createServer } from 'http';
-import { Server } from 'socket.io';
-import Client from 'socket.io-client';
-import { app } from '../server';
-
-describe('Chat Server', () => {
-  let io, serverSocket, clientSocket;
-
-  beforeAll((done) => {
-    const httpServer = createServer(app);
-    io = new Server(httpServer);
-    httpServer.listen(() => {
-      const port = httpServer.address().port;
-      clientSocket = new Client(`http://localhost:${port}`);
-      io.on('connection', (socket) => {
-        serverSocket = socket;
-      });
-      clientSocket.on('connect', done);
-    });
-  });
-
-  afterAll(() => {
-    io.close();
-    clientSocket.close();
-  });
-
-  it('should receive and broadcast chat messages', (done) => {
-    const testMessage = {
-      username: 'testUser',
-      message: 'Hello, World!'
-    };
-
-    clientSocket.on('chat message', (data) => {
-      expect(data.username).toBe(testMessage.username);
-      expect(data.message).toBe(testMessage.message);
-      expect(data.timestamp).toBeDefined();
-      done();
-    });
-
-    clientSocket.emit('chat message', testMessage);
-  });
-
-  it('should not broadcast invalid messages', (done) => {
-    const invalidMessage = {
-      username: '',
-      message: ''
-    };
-
-    let messageReceived = false;
-    clientSocket.on('chat message', () => {
-      messageReceived = true;
-    });
-
-    clientSocket.emit('chat message', invalidMessage);
-
-    setTimeout(() => {
-      expect(messageReceived).toBe(false);
-      done();
-    }, 100);
-  });
-});
-```
-
-1. codespace 内のターミナルで、以下のコマンドを実行し、テストを行います。(テストファイル1件、うちテスト項目3件が failed となっていることがわかります。)
+1. codespace 内のターミナルで、以下のコマンドを実行し、テストを行います。(テストファイル1件、うちテスト項目2件が failed となっていることがわかります。)
    テストを確認後、「q」を押下することで、再度プロンプトを表示することができます。
 
 ```
@@ -305,7 +320,7 @@ module.exports = new MessageHandler();
 </html>
 ```
 
-1. codespace 内のターミナルで、以下のコマンドを実行し、テストを行います。(テスト項目がすべてクリアしたことがわかります。)
+1. codespace 内のターミナルで、以下のコマンドを実行し、テストを行います。(テスト項目がクリアしたことがわかります。)
    テストを確認後、「q」を押下することで、再度プロンプトを表示することができます。
 
 ```
@@ -372,11 +387,15 @@ docker rm -f $(docker ps -qa)
 
 [//]: # (TODO: 複数メンバー前提にしたいので、ここで開発者②がコメントを入れて承認するという流れを追加したいです) → ok だと思うのですが、今思うとレビューアってほとんどやることない気が,,,
 
+**<↓レビューア作業ここから↓>**
+
 1. レビューアは、作成された pull request を開きます。
 
 1. 「Add your review」をクリックします。
 
 1. 変更内容を確認したら、「Review changes」をクリックし、「問題なさそうですb」とコメントを記し、「Approve」を選択して、「Submit review」をクリックします。
+
+**<↑レビューア作業ここまで↑>**
 
 ---
 
@@ -545,11 +564,15 @@ jobs:
 
 ---
 
+**<↓レビューア作業ここから↓>**
+
 1. レビューアは、作成された pull request を開きます。
 
 1. 「Add your review」をクリックします。
 
 1. 変更内容を確認したら、「Review changes」をクリックし、「問題なさそうですb」とコメントを記し、「Approve」を選択して、「Submit review」をクリックします。
+
+**<↑レビューア作業ここまで↑>**
 
 ---
 
@@ -567,93 +590,3 @@ jobs:
 
 1. 先ほど pull request をマージしたことで実行されたパイプラインのステータスを確認します。(パイプラインが失敗していないことを確認します。)
 
-
-
-
-
-[//]: # (TODO: ここはactionsの変更も必要ですが、PRを作成せずにpushしたらCIが走って落ちることを確認する感じにしたいです)
-・パイプライン上でテストが落ちていることを確認する
-
-・テストは、usernameがあることを前提に書かれているが、まだアプリに反映していないので、パイプラインはテストで失敗する。
-
-・まず、「public/index.html」ファイルを編集する(以下のファイルを丸ごとコピペ⇒差分はCodespaces上か、GitHubで確認)
-
-```
-<!DOCTYPE html>
-<html>
-<head>
-  <title>シンプルチャット</title>
-  <meta charset="UTF-8">
-  <style>
-    body { margin: 0; padding: 20px; font-family: sans-serif; }
-    #messages { list-style-type: none; margin: 0; padding: 0; }
-    #messages li { padding: 5px 10px; }
-    #messages li:nth-child(odd) { background: #eee; }
-    #form { background: #fff; padding: 3px; position: fixed; bottom: 0; width: 100%; }
-    #input { border: 1px solid #ddd; padding: 10px; width: 80%; margin-right: .5%; }
-    #form button { width: 18%; background: #4CAF50; color: white; padding: 10px; border: none; }
-    .username { font-weight: bold; color: #2196F3; margin-right: 8px; }
-  </style>
-</head>
-<body>
-  <ul id="messages"></ul>
-  <form id="form" action="">
-    <input id="input" autocomplete="off" placeholder="メッセージを入力..."/><button>送信</button>
-  </form>
-
-  <script src="/socket.io/socket.io.js"></script>
-  <script>
-    let username = '';
-    while (!username.trim()) {
-      username = prompt('ユーザー名を入力してください:');
-    }
-
-    const socket = io({
-      transports: ['websocket', 'polling'],
-      reconnectionAttempts: 5,
-      reconnectionDelay: 1000
-    });
-    const form = document.getElementById('form');
-    const input = document.getElementById('input');
-    const messages = document.getElementById('messages');
-
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      if (input.value) {
-        socket.emit('chat message', {
-          username: username,
-          message: input.value
-        });
-        input.value = '';
-      }
-    });
-
-    socket.on('chat message', (data) => {
-      const li = document.createElement('li');
-      const usernameSpan = document.createElement('span');
-      usernameSpan.className = 'username';
-      usernameSpan.textContent = data.username;
-      
-      li.appendChild(usernameSpan);
-      li.appendChild(document.createTextNode(data.message));
-      messages.appendChild(li);
-      window.scrollTo(0, document.body.scrollHeight);
-    });
-  </script>
-</body>
-</html>
-```
-
-
----
-
----
-
-[//]: # (ここはスライドの方で書くので、手順には書かなくても良いかなと思います)
-・ issueを作成する  
-CIパイプラインにセキュリティスキャンを組み込む
-[//]: # (完了条件としてCIがすべて通っているを追加したい)
-
-
-[//]: # (CVEがなんなのかとかはスライドの方で説明します)
-・github actionsのステータスを確認すると、セキュリティテストで失敗していることがわかる(CVE-2024-21538)
