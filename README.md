@@ -491,8 +491,34 @@ jobs:
       - name: Run tests
         run: npm test
 
-  docker-build-push:
+  security-scan:
     needs: build-and-test
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Build Docker image for scanning
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          load: true
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
+      
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+          ignorefile: .trivyignore
+
+  docker-build-push:
+    if: github.event.pull_request.merged == true
+    needs: security-scan
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -509,7 +535,7 @@ jobs:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-          
+
       - name: Extract metadata for Docker
         id: meta
         uses: docker/metadata-action@v4
@@ -517,7 +543,7 @@ jobs:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
             type=raw,value=${{ env.IMAGE_TAG }}
-          
+                  
       - name: Build and push Docker image
         id: build
         uses: docker/build-push-action@v4
@@ -526,24 +552,6 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-
-  security-scan:
-    needs: docker-build-push
-    runs-on: ubuntu-latest
-    
-    steps:
-      - uses: actions/checkout@v3
-      
-      - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@master
-        with:
-          image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
-          format: 'table'
-          exit-code: '1'
-          ignore-unfixed: true
-          vuln-type: 'os,library'
-          severity: 'CRITICAL,HIGH'
-          ignorefile: .trivyignore
 ```
 
 2-8. ここで、変更作業を commit して、push します。コミットメッセージを入力して、「コミット」をクリックします。
