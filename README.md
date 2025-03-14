@@ -514,7 +514,6 @@ jobs:
           ignore-unfixed: true
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
-          ignorefile: .trivyignore
 
   docker-build-push:
     if: github.event.pull_request.merged == true
