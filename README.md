@@ -95,7 +95,7 @@ docker rm -f $(docker ps -qa)
 
 ```
 import { describe, it, expect } from 'vitest';
-import messageHandler from '../../../../../Works/aishin/chat-app-demo/src/messageHandler';
+import messageHandler from '../src/messageHandler';
 
 describe('validateMessage', () => {
     describe('送信できるメッセージかどうか検証できる', () => {
@@ -164,10 +164,10 @@ npm test
 ```
 class MessageHandler {
   validateMessage(data) {
-    if (!data.username || !data.message) {
+    if (!data.username || !data.message) {  // usernameがない場合の条件分岐の追加
       return false;
     }
-    return data.username.trim().length > 0 && data.message.trim().length > 0;
+    return data.username.trim().length > 0 && data.message.trim().length > 0;  // usernameのtrim処理の追加
   }
 
   formatMessage(data) {
