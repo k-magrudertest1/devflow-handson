@@ -156,7 +156,7 @@ npm test
 
 ![1-5.jpg](./img/1/1-5.jpg)
 
-[//]: # (TODO: Best Effortでやってもらいたいですが一度pushをしてCIが落ちることを確認する作業を追加してほしいです)
+[//]: # (TODO: Best Effortでやってもらいたいですが一度commitとpushをしてCI上でテストが落ちることを確認する作業を追加してほしいです)
 
 2-3. 「src/messageHandler.js」ファイルを編集します。(以下のファイルをコピー&ペーストし、差分を確認します)
 
@@ -186,6 +186,8 @@ module.exports = new MessageHandler();
 ```
 npm test
 ```
+
+[//]: # (TODO: Best Effortでやってもらいたいですが一度commitとpushをしてCI上でもテストが通ることを確認する作業を追加してほしいです)
 
 2-5. 再び、「tests/messageHandler.test.js」ファイルを編集します。(以下のファイルをコピー&ペーストし、差分を確認します)
 
@@ -253,6 +255,8 @@ npm test
 
 ![1-6.jpg](./img/1/1-6.jpg)
 
+[//]: # (TODO: Best Effortでやってもらいたいですが一度commitとpushをしてCI上でテストが落ちることを確認する作業を追加してほしいです)
+
 2-7. 「src/messageHandler.js」ファイルを編集します。(以下のファイルをコピー&ペーストし、差分を確認します)
 
 ```
@@ -266,7 +270,7 @@ class MessageHandler {
 
   formatMessage(data) {
     return {
-      username: data.username.trim(),
+      username: data.username.trim(),  // 追加された項目
       message: data.message.trim(),
       timestamp: new Date().toISOString()
     };
@@ -276,7 +280,10 @@ class MessageHandler {
 module.exports = new MessageHandler();
 ```
 
-2-8. 「public/index.html」ファイルを編集します。(以下のファイルをコピー&ペーストし、差分を確認します)
+[//]: # (TODO: Best Effortでやってもらいたいですが一度commitとpushをしてCI上でもテストが通ることを確認する作業を追加してほしいです)
+
+2-8. アクセス時にユーザー名を入力できるように修正するために「public/index.html」ファイルを編集します。(以下のファイルをコピー&ペーストし、差分を確認します)
+
 
 ```
 <!DOCTYPE html>
