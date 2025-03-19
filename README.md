@@ -5,13 +5,19 @@
 
 ## 0.事前準備
 
+[//]: # (TODO: repositoryのimport手順をスクショ付きで載せて欲しいです)
+
 0-1. 以下のレポジトリをimportします。Owner は ご自身のユーザスペース or ユーザアカウントを選択してください。repository name は `devflow-training` とします。  
    また、Repository は `Public` で作成します。  
 URL：https://github.com/k-magrudertest1/chat-app-demo.git
 
+![00-1.jpg](./img/0/00-1.jpg)
+
+![00-2.jpg](./img/0/00-2.jpg)
+
 0-2. 「devflow-training」という Repository が表示されていればokです。
 
-0-3. Settings > General > Collaboraors にて、「Add people」をクリックし、共同作業者を招待します。
+0-3. Settings > General > Collaborators にて、「Add people」をクリックし、共同作業者を招待します。
 
 0-4. 「Add <共同作業者>」をクリックします。
 
@@ -25,7 +31,7 @@ URL：https://github.com/k-magrudertest1/chat-app-demo.git
 
 ![0-3.jpg](./img/0/0-3.jpg)
 
-## 1.テストの追加と機能追加
+## 1.作業環境の構築と動作確認
 
 1-1. 「devflow-training」という Repository で作業します。
 
@@ -87,62 +93,66 @@ docker rm -f $(docker ps -qa)
 ```
 
 ---
+## 2.自動テストと機能の追加
 
-1-15. はじめに、「tests/messageHandler.test.js」ファイルを編集します。(以下のファイルをコピー&ペーストし、差分を確認します)
+2-1. はじめに、「tests/messageHandler.test.js」ファイルを編集します。(以下のファイルをコピー&ペーストし、差分を確認します)
 
 ```
 import { describe, it, expect } from 'vitest';
 import messageHandler from '../src/messageHandler';
 
-describe('MessageHandler', () => {
-  describe('validateMessage', () => {
-    it('should return false for empty message', () => {
-      const data = { username: 'test', message: '' };
-      expect(messageHandler.validateMessage(data)).toBe(false);
+describe('validateMessage', () => {
+    describe('送信できるメッセージかどうか検証できる', () => {
+        it('空のメッセージを渡すとfalseを返す', () => {
+            const data = { username: 'test', message: '' };
+            expect(messageHandler.validateMessage(data)).toBe(false);
+        });
+        // ====== ここからが追加項目
+        it('空のユーザー名を渡すとfalseを返す', () => {
+            const data = { username: '', message: 'hello' };
+            expect(messageHandler.validateMessage(data)).toBe(false);
+        });
+        
+        it('ユーザー名のみ渡すとfalseを返す', () => {
+            const data = { username: 'test' };
+            expect(messageHandler.validateMessage(data)).toBe(false);
+        });
+        // ====== ここまでが追加項目
+        
+        it('文字列helloを渡すとtrueを返す', () => {
+            const data = { username: 'test', message: 'hello' };
+            expect(messageHandler.validateMessage(data)).toBe(true);
+        });
     });
+});
 
-    it('should return false for empty username', () => {
-      const data = { username: '', message: 'hello' };
-      expect(messageHandler.validateMessage(data)).toBe(false);
-    });
+describe('formatMessage', () => {
+    describe('メッセージ文字列の前後空白を削除できる', () => {
+        it('helloを渡すとそのままhelloを返す', () => {
+            const data = { message: 'hello' };
+            const result = messageHandler.formatMessage(data);
 
-    it('should return false for missing fields', () => {
-      const data = { username: 'test' };
-      expect(messageHandler.validateMessage(data)).toBe(false);
-    });
+            expect(result).toEqual({
+                message: 'hello',
+                timestamp: expect.any(String)
+            });
+        });
 
-    it('should return true for valid message', () => {
-      const data = { username: 'test', message: 'hello' };
-      expect(messageHandler.validateMessage(data)).toBe(true);
-    });
-  });
+        it('_hello_を渡すと空白を削除してhelloを返す', () => {
+            const data = { message: ' hello ' };
+            const result = messageHandler.formatMessage(data);
 
-  describe('formatMessage', () => {
-    it('should format message correctly', () => {
-      const data = { message: 'hello' };
-      const result = messageHandler.formatMessage(data);
-      
-      expect(result).toEqual({
-        message: 'hello',
-        timestamp: expect.any(String)
-      });
+            expect(result).toEqual({
+                message: 'hello',
+                timestamp: expect.any(String)
+            });
+        });
     });
-
-    it('should trim whitespace', () => {
-      const data = { message: ' hello ' };
-      const result = messageHandler.formatMessage(data);
-      
-      expect(result).toEqual({
-        message: 'hello',
-        timestamp: expect.any(String)
-      });
-    });
-  });
 });
 ```
 
-1-16. codespace 内のターミナルで、以下のコマンドを実行し、テストを行います。(テストファイル1件、うちテスト項目1件が failed となっていることがわかります。)
-   テストを確認後、「q」を押下することで、再度プロンプトを表示することができます。
+2-2. codespace 内のターミナルで、以下のコマンドを実行し、テストを行います。(テストファイル1件、うちテスト項目1件が failed となっていることがわかります。)
+   テストを確認後、「q」を押下することで、再度プロンプトを表示できます。
 
 ```
 npm test
@@ -150,15 +160,17 @@ npm test
 
 ![1-5.jpg](./img/1/1-5.jpg)
 
-1-17. 「src/messageHandler.js」ファイルを編集します。(以下のファイルをコピー&ペーストし、差分を確認します)
+[//]: # (TODO: Best Effortでやってもらいたいですが一度commitとpushをしてCI上でテストが落ちることを確認する作業を追加してほしいです)
+
+2-3. 「src/messageHandler.js」ファイルを編集します。(以下のファイルをコピー&ペーストし、差分を確認します)
 
 ```
 class MessageHandler {
   validateMessage(data) {
-    if (!data.username || !data.message) {
+    if (!data.username || !data.message) {  // usernameがない場合の条件分岐の追加
       return false;
     }
-    return data.username.trim().length > 0 && data.message.trim().length > 0;
+    return data.username.trim().length > 0 && data.message.trim().length > 0;  // usernameのtrim処理の追加
   }
 
   formatMessage(data) {
@@ -172,70 +184,74 @@ class MessageHandler {
 module.exports = new MessageHandler();
 ```
 
-1-18. codespace 内のターミナルで、以下のコマンドを実行し、テストを行います。(テスト項目がクリアしたことがわかります。)
-   テストを確認後、「q」を押下することで、再度プロンプトを表示することができます。
+2-4. codespace 内のターミナルで、以下のコマンドを実行し、テストを行います。(テスト項目がクリアしたことがわかります。)
+   テストを確認後、「q」を押下することで、再度プロンプトを表示できます。
 
 ```
 npm test
 ```
 
-1-19. 再び、「tests/messageHandler.test.js」ファイルを編集します。(以下のファイルをコピー&ペーストし、差分を確認します)
+[//]: # (TODO: Best Effortでやってもらいたいですが一度commitとpushをしてCI上でもテストが通ることを確認する作業を追加してほしいです)
+
+2-5. 再び、「tests/messageHandler.test.js」ファイルを編集します。(以下のファイルをコピー&ペーストし、差分を確認します)
 
 ```
 import { describe, it, expect } from 'vitest';
 import messageHandler from '../src/messageHandler';
 
-describe('MessageHandler', () => {
-  describe('validateMessage', () => {
-    it('should return false for empty message', () => {
-      const data = { username: 'test', message: '' };
-      expect(messageHandler.validateMessage(data)).toBe(false);
-    });
+describe('validateMessage', () => {
+    describe('送信できるメッセージかどうか検証できる', () => {
+        it('空のメッセージを渡すとfalseを返す', () => {
+            const data = { username: 'test', message: '' };
+            expect(messageHandler.validateMessage(data)).toBe(false);
+        });
 
-    it('should return false for empty username', () => {
-      const data = { username: '', message: 'hello' };
-      expect(messageHandler.validateMessage(data)).toBe(false);
-    });
+        it('空のユーザー名を渡すとfalseを返す', () => {
+            const data = { username: '', message: 'hello' };
+            expect(messageHandler.validateMessage(data)).toBe(false);
+        });
 
-    it('should return false for missing fields', () => {
-      const data = { username: 'test' };
-      expect(messageHandler.validateMessage(data)).toBe(false);
-    });
+        it('ユーザー名のみ渡すとfalseを返す', () => {
+            const data = { username: 'test' };
+            expect(messageHandler.validateMessage(data)).toBe(false);
+        });
 
-    it('should return true for valid message', () => {
-      const data = { username: 'test', message: 'hello' };
-      expect(messageHandler.validateMessage(data)).toBe(true);
+        it('文字列helloを渡すとtrueを返す', () => {
+            const data = { username: 'test', message: 'hello' };
+            expect(messageHandler.validateMessage(data)).toBe(true);
+        });
     });
-  });
+});
 
-  describe('formatMessage', () => {
-    it('should format message correctly', () => {
-      const data = { username: 'test', message: 'hello' };
-      const result = messageHandler.formatMessage(data);
-      
-      expect(result).toEqual({
-        username: 'test',
-        message: 'hello',
-        timestamp: expect.any(String)
-      });
-    });
+describe('formatMessage', () => {
+    describe('メッセージ文字列の前後空白を削除できる', () => {
+        it('testとhelloを渡すとそのままtestとhelloを返す', () => {  // 変更項目
+            const data = { username: 'test', message: 'hello' };  // 変更項目
+            const result = messageHandler.formatMessage(data);
 
-    it('should trim whitespace', () => {
-      const data = { username: ' test ', message: ' hello ' };
-      const result = messageHandler.formatMessage(data);
-      
-      expect(result).toEqual({
-        username: 'test',
-        message: 'hello',
-        timestamp: expect.any(String)
-      });
+            expect(result).toEqual({
+                username: 'test',  // 追加項目
+                message: 'hello',
+                timestamp: expect.any(String)
+            });
+        });
+
+        it('_test_と_hello_を渡すと空白を削除してtestとhelloを返す', () => {  // 変更項目
+            const data = { username: ' test ', message: ' hello ' };  // 変更項目
+            const result = messageHandler.formatMessage(data);
+
+            expect(result).toEqual({
+                username: 'test',    // 追加項目
+                message: 'hello',
+                timestamp: expect.any(String)
+            });
+        });
     });
-  });
 });
 ```
 
-1-20. codespace 内のターミナルで、以下のコマンドを実行し、テストを行います。(テストファイル1件、うちテスト項目2件が failed となっていることがわかります。)
-   テストを確認後、「q」を押下することで、再度プロンプトを表示することができます。
+2-6. codespace 内のターミナルで、以下のコマンドを実行し、テストを行います。(テストファイル1件、うちテスト項目2件が failed となっていることがわかります。)
+   テストを確認後、「q」を押下することで、再度プロンプトを表示できます。
 
 ```
 npm test
@@ -243,7 +259,9 @@ npm test
 
 ![1-6.jpg](./img/1/1-6.jpg)
 
-1-21. 「src/messageHandler.js」ファイルを編集します。(以下のファイルをコピー&ペーストし、差分を確認します)
+[//]: # (TODO: Best Effortでやってもらいたいですが一度commitとpushをしてCI上でテストが落ちることを確認する作業を追加してほしいです)
+
+2-7. 「src/messageHandler.js」ファイルを編集します。(以下のファイルをコピー&ペーストし、差分を確認します)
 
 ```
 class MessageHandler {
@@ -256,7 +274,7 @@ class MessageHandler {
 
   formatMessage(data) {
     return {
-      username: data.username.trim(),
+      username: data.username.trim(),  // 追加された項目
       message: data.message.trim(),
       timestamp: new Date().toISOString()
     };
@@ -266,7 +284,10 @@ class MessageHandler {
 module.exports = new MessageHandler();
 ```
 
-1-22. 「public/index.html」ファイルを編集します。(以下のファイルをコピー&ペーストし、差分を確認します)
+[//]: # (TODO: Best Effortでやってもらいたいですが一度commitとpushをしてCI上でもテストが通ることを確認する作業を追加してほしいです)
+
+2-8. アクセス時にユーザー名を入力できるように修正するために「public/index.html」ファイルを編集します。(以下のファイルをコピー&ペーストし、差分を確認します)
+
 
 ```
 <!DOCTYPE html>
@@ -334,8 +355,8 @@ module.exports = new MessageHandler();
 </html>
 ```
 
-1-23. codespace 内のターミナルで、以下のコマンドを実行し、テストを行います。(テスト項目がクリアしたことがわかります。)
-   テストを確認後、「q」を押下することで、再度プロンプトを表示することができます。
+2-9. codespace 内のターミナルで、以下のコマンドを実行し、テストを行います。(テスト項目がクリアしたことがわかります。)
+   テストを確認後、「q」を押下することで、再度プロンプトを表示できます。
 
 ```
 npm test
@@ -343,63 +364,65 @@ npm test
 
 ---
 
-1-24. codespace 内のターミナルで、以下のコマンドを実行し、変更したコードで改めてコンテナイメージをビルドします。
+2-10. codespace 内のターミナルで、以下のコマンドを実行し、変更したコードで改めてコンテナイメージをビルドします。
 
 ```
 docker build -t test:2 .
 ```
 
-1-25. 以下のコマンドで、コンテナイメージが作成されたことを確認します。
+2-11. 以下のコマンドで、コンテナイメージが作成されたことを確認します。
 
 ```
 docker image ls
 ```
 
-1-26. 以下のコマンドで、先ほど作成したコンテナイメージを使用し、コンテナを起動します。
+2-12. 以下のコマンドで、先ほど作成したコンテナイメージを使用し、コンテナを起動します。
 
 ```
 docker run -dp 3000:3000 test:2
 ```
 
-1-27. 画面右下にポップアップが表示されます。「ブラウザーで開く」をクリックします。
+2-13. 画面右下にポップアップが表示されます。「ブラウザーで開く」をクリックします。
 
-1-28. ポップアップで、「ユーザー名を入力してください」と表示されます。任意のユーザー名を入力してください。
+2-14. ポップアップで、「ユーザー名を入力してください」と表示されます。任意のユーザー名を入力してください。
 
 ![1-7.jpg](./img/1/1-7.jpg)
 
-1-29. 次に、「メッセージを入力」に文字を入力し、「送信」をクリックすることで、先ほど入力したユーザー名と、入力したメッセージが表示されます。
+2-15. 次に、「メッセージを入力」に文字を入力し、「送信」をクリックすることで、先ほど入力したユーザー名と、入力したメッセージが表示されます。
 
 ![1-8.jpg](./img/1/1-8.jpg)
 
-1-30. 以下のコマンドで、先ほど起動したコンテナを削除します。
+2-16. 以下のコマンドで、先ほど起動したコンテナを削除します。
 
 ```
 docker rm -f $(docker ps -qa)
 ```
 
-1-31. ここで、変更作業を commit して、push します。コミットメッセージを入力して、「コミット」をクリックします。
+2-17. ここで、変更作業を commit して、push します。コミットメッセージを入力して、「コミット」をクリックします。
 
 ![1-9.jpg](./img/1/1-9.jpg)
 
-1-32. 「変更の同期」をクリックします。
+2-18. 「変更の同期」をクリックします。
 
 ![1-10.jpg](./img/1/1-10.jpg)
 
 ---
 
-1-33. codespace から抜けて、「devflow-training」という Repository に戻ります。
+2-19. codespace から抜けて、「devflow-training」という Repository に戻ります。
 
-1-34. 「feature/show-username」ブランチ上で作業します。
+2-20. 「feature/show-username」ブランチ上で作業します。
 
-1-35. 「Actions」タブをクリックします。
+2-21. 「Actions」タブをクリックします。
 
-1-36. 先ほど コミット したことで実行されたパイプラインのステータスを確認します。(パイプラインが失敗していないことを確認します。)
+2-22. 先ほど コミット したことで実行されたパイプラインのステータスを確認します。(パイプラインが失敗していないことを確認します。)
 
 ![1-11.jpg](./img/1/1-11.jpg)
 
-1-37. 「feature/show-username」ブランチ上で、pull request を作成します。
+## 3.変更差分をmainブランチにマージする
 
-1-38. 作成した pull request の Reviewers に共同作業者を追加します。(追加された共同作業者がレビューを行います)
+3-1. 「feature/show-username」ブランチ上で、pull request を作成します。
+
+3-2. 作成した pull request の Reviewers に共同作業者を追加します。(追加された共同作業者がレビューを行います)
 
 ![1-12.jpg](./img/1/1-12.jpg)
 
@@ -407,13 +430,13 @@ docker rm -f $(docker ps -qa)
 
 **<↓レビューア作業ここから↓>**
 
-1-39. レビューアは、作成された pull request を開きます。
+3-3. レビューアは、作成された pull request を開きます。
 
-1-40. 「Add your review」をクリックします。
+3-4. 「Add your review」をクリックします。
 
 ![1-13.jpg](./img/1/1-13.jpg)
 
-1-41. 変更内容を確認したら、「Review changes」をクリックし、「問題なさそうですb」とコメントを記し、「Approve」を選択して、「Submit review」をクリックします。
+3-5. 変更内容を確認したら、「Review changes」をクリックし、「問題なさそうですb」とコメントを記し、「Approve」を選択して、「Submit review」をクリックします。
 
 ![1-14.jpg](./img/1/1-14.jpg)
 
@@ -421,41 +444,41 @@ docker rm -f $(docker ps -qa)
 
 ---
 
-1-42. 開発者は、レビューアから Approved されたことを確認します。
+3-6. 開発者は、レビューアから Approved されたことを確認します。
 
-1-43. 「Merge pull request」をクリックします。
+3-7. 「Merge pull request」をクリックします。
 
-1-44. 「Confirm merge」をクリックします。
+3-8. 「Confirm merge」をクリックします。
 
-1-45. 「Delete branch」をクリックします。
+3-9. 「Delete branch」をクリックします。
 
-1-46. 「Delete codespace」をクリックします。
+3-10. 「Delete codespace」をクリックします。
 
-1-47. 「Actions」タブをクリックします。
+3-11. 「Actions」タブをクリックします。
 
-1-48. 先ほど pull request をマージしたことで実行されたパイプラインのステータスを確認します。(パイプラインが失敗していないことを確認します。)
+3-12. 先ほど pull request をマージしたことで実行されたパイプラインのステータスを確認します。(パイプラインが失敗していないことを確認します。)
 
 ![1-15.jpg](./img/1/1-15.jpg)
 
 ---
 
-## 2.セキュリティスキャンの追加とCVEの対応
+## 4.セキュリティスキャンの追加とCVEの対応
 
-2-1. 「devflow-training」という Repository で作業します。
+4-1. 「devflow-training」という Repository で作業します。
 
-2-2. 画面の左上タブの「<> Code」が選択されていることを確認してください。
+4-2. 画面の左上タブの「<> Code」が選択されていることを確認してください。
 
-2-3. 「main」と表示されている部分をクリックします。
+4-3. 「main」と表示されている部分をクリックします。
 
-2-4. 「Find or create a branch」に `feature/introduce-trivy-pipeline` と入力します。
+4-4. 「Find or create a branch」に `feature/introduce-trivy-pipeline` と入力します。
 
-2-5. 「Create branch *feature/introduce-trivy-pipeline* from *main*」をクリックします。
+4-5. 「Create branch *feature/introduce-trivy-pipeline* from *main*」をクリックします。
 
-2-6. 画面右側、緑色で表示されている「<> Code」をクリックし、「Create codespace on feature/introduce-t...」をクリックします。
+4-6. 画面右側、緑色で表示されている「<> Code」をクリックし、「Create codespace on feature/introduce-t...」をクリックします。
 
 ---
 
-2-7. 「.github/workflows/ci-cd.yml」ファイルを編集します。(以下のファイルをコピー&ペーストし、差分を確認します)
+4-7. 「.github/workflows/ci-cd.yml」ファイルを編集します。(以下のファイルをコピー&ペーストし、差分を確認します)
 
 ```
 name: CI/CD Pipeline
@@ -553,74 +576,78 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
 ```
 
-2-8. ここで、変更作業を commit して、push します。コミットメッセージを入力して、「コミット」をクリックします。
+4-8. ここで、変更作業を commit して、push します。コミットメッセージを入力して、「コミット」をクリックします。
 
-2-9. 「変更の同期」をクリックします。
+4-9. 「変更の同期」をクリックします。
 
 ---
 
-2-10. codespace から抜けて、「devflow-training」という Repository に戻ります。
+4-10. codespace から抜けて、「devflow-training」という Repository に戻ります。
 
-2-11. 「feature/introduce-trivy-pipeline」ブランチ上で作業します。
+4-11. 「feature/introduce-trivy-pipeline」ブランチ上で作業します。
 
-2-12. 「Actions」タブをクリックします。
+4-12. 「Actions」タブをクリックします。
 
-2-13. 先ほど コミット したことで実行されたパイプラインのステータスを確認します。(追加したセキュリティスキャンが失敗していることを確認します。)
+4-13. 先ほど コミット したことで実行されたパイプラインのステータスを確認します。(追加したセキュリティスキャンが失敗していることを確認します。)
 
 ![2-1.jpg](./img/2/2-1.jpg)
 
 ---
 
-2-14. codespaceに戻ります。
+4-14. codespaceに戻ります。
 
-2-15. まず、「.github/workflows/ci-cd.yml」ファイルを編集します。( `node-version: '18'` を `node-version: '23'` に変更してください。)
+4-15. まず、「.github/workflows/ci-cd.yml」ファイルを編集します。( `node-version: '18'` を `node-version: '23'` に変更してください。)
 
-2-16. 次に、「Dockerfile」ファイルを編集します。( `FROM node:18-slim` を `FROM node:23-slim` に変更してください。)
+4-16. 次に、「Dockerfile」ファイルを編集します。( `FROM node:18-slim` を `FROM node:23-slim` に変更してください。)
 
-2-17. 変更作業を commit して、push します。コミットメッセージを入力して、「コミット」をクリックします。
+4-17. 変更作業を commit して、push します。コミットメッセージを入力して、「コミット」をクリックします。
 
-2-18. 「変更の同期」をクリックします。
+4-18. 「変更の同期」をクリックします。
 
 ---
 
-2-19. codespace から抜けて、「devflow-training」という Repository に戻ります。
+4-19. codespace から抜けて、「devflow-training」という Repository に戻ります。
 
-2-20. 「feature/introduce-trivy-pipeline」ブランチ上で作業します。
+4-20. 「feature/introduce-trivy-pipeline」ブランチ上で作業します。
 
-2-21. 「Actions」タブをクリックします。
+4-21. 「Actions」タブをクリックします。
 
-2-22. 先ほど コミット したことで実行されたパイプラインのステータスを確認します。(パイプラインが失敗していないことを確認します。)
+4-22. 先ほど コミット したことで実行されたパイプラインのステータスを確認します。(パイプラインが失敗していないことを確認します。)
 
-2-23. 「feature/introduce-trivy-pipeline」ブランチ上で、pull request を作成します。
+## 5.変更差分をmainブランチにマージする
 
-2-24. 作成した pull request の Reviewers に共同作業者を追加します。(追加された共同作業者がレビューを行います)
+5-1. 「feature/introduce-trivy-pipeline」ブランチ上で、pull request を作成します。
+
+5-2. 作成した pull request の Reviewers に共同作業者を追加します。(追加された共同作業者がレビューを行います)
 
 ---
 
 **<↓レビューア作業ここから↓>**
 
-2-25. レビューアは、作成された pull request を開きます。
+5-3. レビューアは、作成された pull request を開きます。
 
-2-26. 「Add your review」をクリックします。
+5-4. 「Add your review」をクリックします。
 
-2-27. 変更内容を確認したら、「Review changes」をクリックし、「問題なさそうですb」とコメントを記し、「Approve」を選択して、「Submit review」をクリックします。
+5-5. 変更内容を確認したら、「Review changes」をクリックし、「問題なさそうですb」とコメントを記し、「Approve」を選択して、「Submit review」をクリックします。
 
 **<↑レビューア作業ここまで↑>**
 
 ---
 
-2-28. 開発者は、レビューアから Approved されたことを確認します。
+5-5. 開発者は、レビューアから Approved されたことを確認します。
 
-2-29. 「Merge pull request」をクリックします。
+5-6. 「Merge pull request」をクリックします。
 
-2-30. 「Confirm merge」をクリックします。
+5-7. 「Confirm merge」をクリックします。
 
-2-31. 「Delete branch」をクリックします。
+5-8. 「Delete branch」をクリックします。
 
-2-32. 「Delete codespace」をクリックします。
+5-9. 「Delete codespace」をクリックします。
 
-2-33. 「Actions」タブをクリックします。
+5-10. 「Actions」タブをクリックします。
 
-2-34. 先ほど pull request をマージしたことで実行されたパイプラインのステータスを確認します。(パイプラインが失敗していないことを確認します。)
+5-11. 先ほど pull request をマージしたことで実行されたパイプラインのステータスを確認します。(パイプラインが失敗していないことを確認します。)
 
 ![2-2.jpg](./img/2/2-2.jpg)
+
+以上でハンズオンが終了となります。お疲れ様でした。
