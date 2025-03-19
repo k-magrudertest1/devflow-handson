@@ -307,6 +307,7 @@ module.exports = new MessageHandler();
   </style>
 </head>
 <body>
+  <h1>Simple Chat Service (Enter your message below)</h1>
   <ul id="messages"></ul>
   <form id="form" action="">
     <input id="input" autocomplete="off" placeholder="メッセージを入力..."/><button>送信</button>
