@@ -11,6 +11,10 @@
    また、Repository は `Public` で作成します。  
 URL：https://github.com/k-magrudertest1/chat-app-demo.git
 
+![00-1.jpg](./img/0/00-1.jpg)
+
+![00-2.jpg](./img/0/00-2.jpg)
+
 0-2. 「devflow-training」という Repository が表示されていればokです。
 
 0-3. Settings > General > Collaborators にて、「Add people」をクリックし、共同作業者を招待します。
