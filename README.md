@@ -17,7 +17,7 @@ URL：https://github.com/k-magrudertest1/chat-app-demo.git
 
 0-2. 「devflow-training」という Repository が表示されていればokです。
 
-0-3. Settings > General > Collaborators にて、「Add people」をクリックし、共同作業者を招待します。
+0-3. Settings > General > Collaborators にて、「Add people」をクリックし、共同作業者を招待します。(共同者のアカウントは各自ご確認ください。)
 
 0-4. 「Add <共同作業者>」をクリックします。
 
